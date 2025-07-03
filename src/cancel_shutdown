@@ -11,3 +11,17 @@ echo "User $USER has canceled their shutdown vote"
 if sudo shutdown -c 2>/dev/null; then
     wall "Shutdown has been canceled by $USER"
 fi
+
+VOTERS_FILE="$CONFIG_DIR/eligible_voters.txt"
+echo "Current status:"
+# Only process actual usernames (ignore comments and empty lines)
+while read -r voter; do
+    # Skip empty lines and comments
+    [[ -z "$voter" || "$voter" =~ ^[[:space:]]*# ]] && continue
+    
+    if [ -f "$CONFIG_DIR/$voter.shutdown" ]; then
+        echo "- $voter: YES"
+    else
+        echo "- $voter: NO"
+    fi
+done < <(grep -v "^#" "$VOTERS_FILE" | grep -v "^[[:space:]]*$")
