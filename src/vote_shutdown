@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Configuration
+CONFIG_DIR="/opt/shutdown_system"
+# File containing list of users eligible to vote (one username per line)
+VOTERS_FILE="$CONFIG_DIR/eligible_voters.txt"
+
+# Create config directory and files if they don't exist
+if [ ! -d "$CONFIG_DIR" ]; then
+    sudo mkdir -p "$CONFIG_DIR"
+    sudo chmod 775 "$CONFIG_DIR"
+fi
+
+if [ ! -f "$VOTERS_FILE" ]; then
+    echo "Creating eligible voters file. Please edit it with the list of users."
+    echo "user1" | sudo tee "$VOTERS_FILE"
+    echo "user2" | sudo tee -a "$VOTERS_FILE"
+    sudo chmod 664 "$VOTERS_FILE"
+fi
+
+# Check if current user is eligible to vote
+USER=$(whoami)
+if ! grep -q "^$USER$" "$VOTERS_FILE"; then
+    echo "Sorry, $USER is not authorized to vote for system shutdown."
+    exit 1
+fi
+
+# Record this user's vote
+echo "User $USER is voting to shut down the system"
+touch "$CONFIG_DIR/$USER.shutdown"
+
+# Check if all eligible voters have voted
+ALL_VOTED=true
+for voter in $(cat "$VOTERS_FILE"); do
+    if [ ! -f "$CONFIG_DIR/$voter.shutdown" ]; then
+        ALL_VOTED=false
+        break
+    fi
+done
+
+if $ALL_VOTED; then
+    echo "All eligible voters have agreed to shut down. Shutting down in 1 minute..."
+    wall "System shutdown initiated - all authorized voters have approved. Shutting down in 1 minute."
+    sudo shutdown -h +1
+else
+    echo "Waiting for all eligible voters to agree to shutdown."
+    echo "Current status:"
+    for voter in $(cat "$VOTERS_FILE"); do
+        if [ -f "$CONFIG_DIR/$voter.shutdown" ]; then
+            echo "- $voter: YES"
+        else
+            echo "- $voter: NO"
+        fi
+    done
+fi

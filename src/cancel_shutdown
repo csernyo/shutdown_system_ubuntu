@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CONFIG_DIR="/opt/shutdown_system"
+USER=$(whoami)
+
+# Remove user's vote file
+rm -f "$CONFIG_DIR/$USER.shutdown"
+echo "User $USER has canceled their shutdown vote"
+
+# Check if shutdown is pending and cancel if needed
+if sudo shutdown -c 2>/dev/null; then
+    wall "Shutdown has been canceled by $USER"
+fi

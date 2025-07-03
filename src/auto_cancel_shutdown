@@ -1,0 +1,5 @@
+#!/bin/bash
+if [ -d "/home/$PAM_USER" ]; then
+  su - "$PAM_USER" -c "/usr/local/bin/cancel-shutdown" > /dev/null 2>&1
+fi
+exit 0
