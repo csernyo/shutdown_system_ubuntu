@@ -49,12 +49,6 @@ if [ ! -f "$CONFIG_DIR/eligible_voters.txt" ]; then
     chmod 664 "$CONFIG_DIR/eligible_voters.txt"
 fi
 
-# Configure PAM to run auto-cancel on login
-if ! grep -q "$AUTO_CANCEL_SHUTDOWN" /etc/pam.d/common-session; then
-    echo "session optional pam_exec.so /usr/local/bin/$AUTO_CANCEL_SHUTDOWN" >> /etc/pam.d/common-session
-    echo "PAM configuration updated to cancel shutdown votes on login"
-fi
-
 # Set up sudo permissions
 cat > /etc/sudoers.d/shutdown_voting << 'EOF'
 # Allow users to run shutdown and voting commands without password
