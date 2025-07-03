@@ -27,7 +27,7 @@ fi
 
 # Record this user's vote
 echo "User $USER is voting to shut down the system"
-touch "$CONFIG_DIR/$USER.shutdown"
+sudo touch "$CONFIG_DIR/$USER.shutdown"
 
 # Check if all eligible voters have voted
 ALL_VOTED=true
