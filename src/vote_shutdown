@@ -45,11 +45,16 @@ if $ALL_VOTED; then
 else
     echo "Waiting for all eligible voters to agree to shutdown."
     echo "Current status:"
-    for voter in $(cat "$VOTERS_FILE"); do
+    
+    # Only process actual usernames (ignore comments and empty lines)
+    while read -r voter; do
+        # Skip empty lines and comments
+        [[ -z "$voter" || "$voter" =~ ^[[:space:]]*# ]] && continue
+        
         if [ -f "$CONFIG_DIR/$voter.shutdown" ]; then
             echo "- $voter: YES"
         else
             echo "- $voter: NO"
         fi
-    done
+    done < <(grep -v "^#" "$VOTERS_FILE" | grep -v "^[[:space:]]*$")
 fi
