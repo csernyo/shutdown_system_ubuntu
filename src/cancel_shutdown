@@ -4,7 +4,7 @@ CONFIG_DIR="/opt/shutdown_system"
 USER=$(whoami)
 
 # Remove user's vote file
-rm -f "$CONFIG_DIR/$USER.shutdown"
+sudo rm -f "$CONFIG_DIR/$USER.shutdown"
 echo "User $USER has canceled their shutdown vote"
 
 # Check if shutdown is pending and cancel if needed
