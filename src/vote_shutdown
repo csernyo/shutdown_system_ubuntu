@@ -31,12 +31,16 @@ sudo touch "$CONFIG_DIR/$USER.shutdown"
 
 # Check if all eligible voters have voted
 ALL_VOTED=true
-for voter in $(cat "$VOTERS_FILE"); do
+while read -r voter; do
+    # Skip empty lines and comment lines
+    [[ -z "$voter" || "$voter" =~ ^[[:space:]]*# ]] && continue
+    
+    echo "Checking vote for $voter..."
     if [ ! -f "$CONFIG_DIR/$voter.shutdown" ]; then
         ALL_VOTED=false
         break
     fi
-done
+done < "$VOTERS_FILE"
 
 if $ALL_VOTED; then
     echo "All eligible voters have agreed to shut down. Shutting down in 1 minute..."
