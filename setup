@@ -57,8 +57,10 @@ fi
 
 # Set up sudo permissions
 cat > /etc/sudoers.d/shutdown_voting << 'EOF'
-# Allow users to run shutdown without password for the voting system
-%sudo ALL=(ALL) NOPASSWD: /sbin/shutdown
+# Allow users to run shutdown and voting commands without password
+%sudo ALL=(ALL) NOPASSWD: /usr/sbin/shutdown, /usr/local/bin/$VOTE_SHUTDOWN, /usr/local/bin/$CANCEL_SHUTDOWN
+Cmnd_Alias SHUTDOWN_VOTE_CMDS = /usr/bin/touch /opt/shutdown_system/*.shutdown, /usr/bin/rm -f /opt/shutdown_system/*.shutdown
+%sudo ALL=(ALL) NOPASSWD: SHUTDOWN_VOTE_CMDS
 EOF
 chmod 440 /etc/sudoers.d/shutdown_voting
 
