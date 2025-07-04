@@ -52,11 +52,23 @@ fi
 # Set up sudo permissions
 cat > /etc/sudoers.d/shutdown_voting << 'EOF'
 # Allow users to run shutdown and voting commands without password
-%sudo ALL=(ALL) NOPASSWD: /usr/sbin/shutdown, /usr/local/bin/$VOTE_SHUTDOWN, /usr/local/bin/$CANCEL_SHUTDOWN
+%sudo ALL=(ALL) NOPASSWD: /usr/sbin/shutdown, /usr/local/bin/reset_votes, /usr/local/bin/$VOTE_SHUTDOWN, /usr/local/bin/$CANCEL_SHUTDOWN
 Cmnd_Alias SHUTDOWN_VOTE_CMDS = /usr/bin/touch /opt/shutdown_system/*.shutdown, /usr/bin/rm -f /opt/shutdown_system/*.shutdown
 %sudo ALL=(ALL) NOPASSWD: SHUTDOWN_VOTE_CMDS
 EOF
 chmod 440 /etc/sudoers.d/shutdown_voting
+
+# Install vote reset script
+cp "src/reset_votes" /usr/local/bin/
+chmod +x /usr/local/bin/reset_votes
+
+# Install systemd service
+cp "src/shutdown_votes_reset.service" /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable shutdown_votes_reset.service
+systemctl start shutdown_votes_reset.service
+
+echo "Vote reset on startup configured."
 
 echo "Shutdown voting system installation complete!"
 echo ""
