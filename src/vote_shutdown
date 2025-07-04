@@ -42,10 +42,25 @@ while read -r voter; do
     fi
 done < "$VOTERS_FILE"
 
+# Notify and terminate current user's session
+echo "Your vote has been recorded. Your session will be logged out in 10 seconds."
+sleep 10
+echo "Logging out..."
+
+# Use the appropriate logout method based on session type
+if [ -n "$DISPLAY" ]; then
+    # Graphical session
+    gnome-session-quit --logout --no-prompt &
+else
+    # Terminal/SSH session
+    loginctl terminate-user $USER &
+fi
+
 if $ALL_VOTED; then
     echo "All eligible voters have agreed to shut down. Shutting down in 1 minute..."
     wall "System shutdown initiated - all authorized voters have approved. Shutting down in 1 minute."
     sudo shutdown -h +1
+    exit 0
 else
     echo "Waiting for all eligible voters to agree to shutdown."
     echo "Current status:"
@@ -61,4 +76,5 @@ else
             echo "- $voter: NO"
         fi
     done < <(grep -v "^#" "$VOTERS_FILE" | grep -v "^[[:space:]]*$")
+    exit 0
 fi
