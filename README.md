@@ -2,6 +2,12 @@
 
 A safety-oriented system that requires consensus from designated users before shutting down an Ubuntu server.
 
+## Use
+Run `shutdown_vote` to cast your vote, check status, or initiate a shutdown once all votes are in.
+
+Run `cancel_shutdown` to withdraw your vote if you change your mind.
+
+
 ## Overview
 
 This application provides a democratic approach to system shutdown management. It ensures critical servers aren't accidentally turned off while important users are working by requiring all designated eligible voters to approve a shutdown.
