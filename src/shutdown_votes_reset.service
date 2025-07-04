@@ -1,0 +1,11 @@
+[Unit]
+Description=Reset shutdown voting system on boot
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/reset_votes
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
