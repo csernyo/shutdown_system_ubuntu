@@ -70,6 +70,12 @@ systemctl start shutdown_votes_reset.service
 
 echo "Vote reset on startup configured."
 
+# Configure PAM to run auto-cancel for SSH logins
+if ! grep -q "auto_cancel_shutdown" /etc/pam.d/sshd; then
+    echo "session optional pam_exec.so /usr/local/bin/auto_cancel_shutdown" | sudo tee -a /etc/pam.d/sshd > /dev/null
+    echo "SSH PAM configuration updated to cancel shutdown votes on SSH login"
+fi
+
 echo "Shutdown voting system installation complete!"
 echo ""
 echo "IMPORTANT: Edit the eligible voters file to include the correct usernames:"

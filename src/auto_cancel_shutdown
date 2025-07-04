@@ -1,0 +1,15 @@
+#!/bin/bash
+
+CONFIG_DIR="/opt/shutdown_system"
+VOTER_FILE="$CONFIG_DIR/$PAM_USER.shutdown"
+
+# Log the event
+logger "Shutdown voting system: Checking login for $PAM_USER"
+
+# If this user has a shutdown vote, remove it
+if [ -f "$VOTER_FILE" ]; then
+    sudo rm -f "$VOTER_FILE"
+    logger "Shutdown voting system: Canceled shutdown vote for $PAM_USER due to login"
+fi
+
+exit 0
