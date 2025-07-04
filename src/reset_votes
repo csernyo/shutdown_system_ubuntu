@@ -1,0 +1,11 @@
+#!/bin/bash
+
+CONFIG_DIR="/opt/shutdown_system"
+
+# Remove all shutdown vote files
+sudo rm -f "$CONFIG_DIR"/*.shutdown
+
+# Log the reset action
+logger "Shutdown voting system: All votes have been reset after system startup"
+
+exit 0
