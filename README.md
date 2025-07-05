@@ -17,7 +17,7 @@ This application provides a democratic approach to system shutdown management. I
 - **Voting System**: Only shuts down when all eligible voters agree
 - **Status Tracking**: Easy-to-read status of current votes
 - **Safety Guards**: Prevents accidental shutdowns
-- **Vote Reset on Boot and SSH login**: All votes are cleared on system startup and ssh login
+- **Vote Reset on SSH login**: Vote is cleared for user on ssh login
 
 ## Installation
 sudo ./setup
