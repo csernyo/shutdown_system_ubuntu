@@ -1,0 +1,52 @@
+#!/bin/bash
+# filepath: /home/oliver/Documents/git/shutdown_system_ubuntu/uninstall
+
+if [ "$(id -u)" -ne 0 ]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
+echo "Uninstalling shutdown voting system..."
+
+# Define variables (same as in setup script)
+CONFIG_DIR="/opt/shutdown_system"
+VOTE_SHUTDOWN="vote_shutdown"
+CANCEL_SHUTDOWN="cancel_shutdown"
+AUTO_CANCEL_SHUTDOWN="auto_cancel_shutdown"
+
+# Remove the scripts
+echo "Removing scripts..."
+rm -f /usr/local/bin/$VOTE_SHUTDOWN
+rm -f /usr/local/bin/$CANCEL_SHUTDOWN
+rm -f /usr/local/bin/$AUTO_CANCEL_SHUTDOWN
+rm -f /usr/local/bin/reset_votes
+
+# Remove the sudo permissions
+echo "Removing sudo configurations..."
+rm -f /etc/sudoers.d/shutdown_voting
+
+# Remove the configuration directory
+echo "Removing configuration directory and files..."
+rm -rf $CONFIG_DIR
+
+# Remove PAM configuration
+echo "Removing PAM configuration..."
+if grep -q "auto_cancel_shutdown" /etc/pam.d/sshd; then
+    # Create a temporary file without the auto_cancel line
+    grep -v "auto_cancel_shutdown" /etc/pam.d/sshd > /tmp/sshd.tmp
+    # Replace the original file
+    mv /tmp/sshd.tmp /etc/pam.d/sshd
+    echo "PAM configuration removed from SSH login"
+fi
+
+# Remove systemd service if it exists
+if [ -f /etc/systemd/system/shutdown_votes_reset.service ]; then
+    echo "Removing systemd service..."
+    systemctl stop shutdown_votes_reset.service 2>/dev/null || true
+    systemctl disable shutdown_votes_reset.service 2>/dev/null || true
+    rm -f /etc/systemd/system/shutdown_votes_reset.service
+    systemctl daemon-reload
+fi
+
+echo "Shutdown voting system has been successfully uninstalled."
+echo "You may need to restart your SSH service for all changes to take effect."
